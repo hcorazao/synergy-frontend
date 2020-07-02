@@ -1,0 +1,158 @@
+<mat-accordion class="container">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        PAYROLL INFORMATION
+      </mat-panel-title>
+      <mat-panel-description>
+        EXPAND
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <form
+      class="form"
+      [formGroup]="payrollForm"
+      id="payrollForm"
+      fxLayout.xs="column"
+    >
+      <table style="width: 100%;">
+        <tr fxLayout.xs="column">
+          <td colspan="3">
+            <mat-form-field appearance="outline">
+              <mat-label>TIN #</mat-label>
+              <input
+                matInput
+                formControlName="TIN"
+                placeholder="Tax Identification Number"
+                [readonly]="!this.authorization.edit"
+              />
+            </mat-form-field>
+          </td>
+          <td colspan="3">
+            <mat-form-field
+              appearance="outline"
+              [ngClass]="{ 'readonly-wrapper': !this.authorization.edit }"
+            >
+              <mat-label>PAYROLL TYPE</mat-label>
+              <mat-select
+                placeholder="Payroll Type"
+                formControlName="payrollType"
+              >
+                <mat-option value="">
+                  - SELECT PAYROLL TYPE -
+                </mat-option>
+                <mat-option
+                  *ngFor="let payrollType of payrollTypes"
+                  [value]="payrollType.value"
+                >
+                  {{ payrollType.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr fxLayout.xs="column">
+          <td colspan="3">
+            <mat-form-field
+              appearance="outline"
+              [ngClass]="{ 'readonly-wrapper': !this.authorization.edit }"
+            >
+              <mat-label>BANK ENTITY</mat-label>
+              <mat-select placeholder="Bank Name" formControlName="bankName">
+                <mat-option value="">
+                  - SELECT BANK -
+                </mat-option>
+                <mat-option value="Heritage Bank">
+                  Heritage Bank
+                </mat-option>
+                <mat-option value="Scotiabank">
+                  Scotiabank
+                </mat-option>
+                <mat-option value="Atlantic Bank">
+                  Atlantic Bank
+                </mat-option>
+                <mat-option value="Belize Bank">
+                  Belize Bank
+                </mat-option>
+                <mat-option value="SJCU">
+                  SJCU
+                </mat-option>
+                <mat-option value="LICU">
+                  LICU
+                </mat-option>
+                <mat-option value="HRCU">
+                  HRCU
+                </mat-option>
+                <mat-option value="National Bank">
+                  National Bank
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+          <td colspan="3">
+            <mat-form-field appearance="outline">
+              <mat-label>BANK ACCOUNT #</mat-label>
+              <input
+                matInput
+                formControlName="bankAccount"
+                placeholder="1234567"
+                [readonly]="!this.authorization.edit"
+              />
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <mat-form-field
+              appearance="outline"
+              [ngClass]="{ 'readonly-wrapper': !this.authorization.edit }"
+            >
+              <mat-label>Payment Type</mat-label>
+              <mat-select
+                placeholder="paymentType"
+                formControlName="paymentType"
+              >
+                <mat-option value="null">
+                  Select
+                </mat-option>
+                <mat-option value="Wire Transfer">
+                  Wire Transfer
+                </mat-option>
+                <mat-option value="Cheque">
+                  Cheque
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="pa-2">
+            <mat-checkbox formControlName="billable" color="primary"
+                          matTooltip="TICK THIS IF THE PERSON'S WORK IS BILLED TO OUR CLIENTS">
+              <div *ngIf="payrollForm.invalid && payrollForm.touched; then thenBlock else elseBlock"></div>
+              <ng-template #thenBlock>
+                <mat-error><b>BILLABLE</b></mat-error>
+              </ng-template>
+              <ng-template #elseBlock>
+                <span><b>BILLABLE</b></span>
+              </ng-template>
+            </mat-checkbox>
+          </td>
+        </tr>
+      </table>
+    </form>
+
+    <mat-error *ngIf="payrollForm.invalid && payrollForm.touched">WOOPS! Some of the fields are either empty or invalid.
+      Please double check and try again.
+    </mat-error>
+    <button
+      mat-stroked-button
+      color="primary"
+      class="button"
+      (click)="onSubmit()"
+      *ngIf="this.authorization.edit"
+    >
+      <mat-icon>save</mat-icon>
+      <span>SAVE</span>
+    </button>
+  </mat-expansion-panel>
+</mat-accordion>

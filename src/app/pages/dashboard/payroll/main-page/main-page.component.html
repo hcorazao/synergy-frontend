@@ -1,0 +1,14 @@
+<mat-toolbar class="header" color="primary">
+  <mat-toolbar-row>
+    <span>Payroll Management</span>
+    <span class="fill-remaining-space"></span>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-tab-group backgroundColor="primary">
+  <mat-tab label="PAYROLL WEEKS">
+    <app-non-finalized-payrolls></app-non-finalized-payrolls>
+  </mat-tab>
+  <mat-tab label="PAYED PAYROLL RUNS">
+    <app-payed-payrolls></app-payed-payrolls>
+  </mat-tab>
+</mat-tab-group>

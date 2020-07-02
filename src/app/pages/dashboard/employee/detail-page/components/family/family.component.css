@@ -1,0 +1,24 @@
+mat-form-field {
+  margin: 6px;
+}
+.filter {
+  width: 30%;
+}
+.container {
+  margin: 5px;
+}
+.form {
+  width: 100%;
+}
+
+.expandedComment {
+  display: none;
+}
+
+.noExpandedComment {
+  display: inline;
+}
+
+span {
+  margin: 10px;
+}

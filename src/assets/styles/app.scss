@@ -1,0 +1,29 @@
+@import "scss/material.variables";
+@import "scss/material.themes";
+@import "scss/mixins/bi-app/bi-app-ltr";
+// Core Variables and Mixins
+@import "scss/app.variables";
+@import "scss/mixins";
+// Core Styles
+@import "scss/core";
+@import "scss/material";
+@import "scss/utilities/utilities";
+@import "~@sweetalert2/theme-material-ui/material-ui";
+@import "~@swimlane/ngx-datatable/index.css";
+@import "~@swimlane/ngx-datatable/themes/material.scss";
+@import "~@swimlane/ngx-datatable/assets/icons.css";
+@import '~saturn-datepicker/theming';
+
+@include sat-datepicker-theme($theme);
+
+/*leave table styles*/
+.btn-leave-table-action{
+    width: 120px;
+  span {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+ngx-datatable {
+  box-shadow: none !important;
+}

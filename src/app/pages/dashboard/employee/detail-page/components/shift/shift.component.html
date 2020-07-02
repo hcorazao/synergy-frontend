@@ -1,0 +1,243 @@
+<mat-accordion class="container">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        SHIFT INFORMATION
+      </mat-panel-title>
+      <mat-panel-description>
+        EXPAND
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <div class="example-container">
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        fxLayoutGap="10px"
+      >
+        <div [formGroup]="searchForm">
+          <mat-form-field appearance="fill">
+            <input
+              matInput
+              [matDatepickerFilter]="myFilter"
+              [matDatepicker]="fromPicker"
+              placeholder="FROM DATE"
+              formControlName="fromDate"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="fromPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <input
+              matInput
+              [matDatepickerFilter]="myFilter"
+              [matDatepicker]="toPicker"
+              placeholder="TO DATE"
+              formControlName="toDate"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="toPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="onSearch(searchForm.value.fromDate, searchForm.value.toDate)"
+        >
+          <span>REFRESH</span>
+        </button>
+      </div>
+
+      <mat-card-subtitle>
+        <span fxFlex="auto" fxFlexFill></span>
+        <span stype="white-space: nowrap;"
+          >SHIFT&nbsp;FROM&nbsp;{{
+            searchForm.value.fromDate | date: "MM/dd"
+          }}&nbsp;TO&nbsp;{{ searchForm.value.toDate | date: "MM/dd" }}</span
+        >
+        <span fxFlex="auto" fxFlexFill></span>
+      </mat-card-subtitle>
+
+      <table mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <ng-container matColumnDef="day">
+          <th mat-header-cell *matHeaderCellDef>DATE</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.date | date: "EEEE  MM/dd" }}
+          </td>
+          <td mat-footer-cell *matFooterCellDef>TOTAL</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>STATUS</th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              mat-flat-button
+              [className]="
+                row.onShift
+                  ? 'onshift mat-flat-button'
+                  : 'dayoff mat-flat-button'
+              "
+              disableRipple="true"
+            >
+              {{ row.onShift ? "ON SHIFT" : "DAY OFF" }}
+            </button>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="attendance">
+          <th mat-header-cell *matHeaderCellDef>ATTENDANCE</th>
+          <td mat-cell *matCellDef="let row">
+            <ng-container *ngIf="!row.readonly; else elseTemplate">
+              {{ row.attendance }}
+            </ng-container>
+            <ng-template #elseTemplate>
+              <mat-select
+                placeholder="attendance status"
+                [(ngModel)]="row.attendance"
+                name="item"
+              >
+                <mat-option *ngFor="let item of items" [value]="item">
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+            </ng-template>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="shift">
+          <th mat-header-cell *matHeaderCellDef>SHIFT</th>
+          <td mat-cell *matCellDef="let row">
+            <input
+              type="time"
+              *ngIf="row.onShift"
+              [ngClass]="row.readonly ? 'editable-border' : 'editable'"
+              [(ngModel)]="row.shiftStartTime"
+              [readonly]="!row.readonly"
+            />&mdash;
+            <input
+              type="time"
+              *ngIf="row.onShift"
+              [ngClass]="row.readonly ? 'editable-border' : 'editable'"
+              [(ngModel)]="row.shiftEndTime"
+              [readonly]="!row.readonly"
+            />
+          </td>
+
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="scheduledHours">
+          <th mat-header-cell *matHeaderCellDef>SCHED HRS</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row?.shiftScheduledHours | minutesHours }}
+          </td>
+          <td mat-footer-cell *matFooterCellDef>
+            {{ totalSched | minutesHours }}
+          </td>
+        </ng-container>
+        <ng-container
+          matColumnDef="workedHours"
+          style="background-color: aliceblue;"
+        >
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            style="background-color: aliceblue;"
+          >
+            REAL HRS
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            style="background-color: aliceblue;"
+          >
+            {{ row?.systemHours?.value }}
+          </td>
+          <td
+            mat-footer-cell
+            *matFooterCellDef
+            style="background-color: aliceblue;"
+          >
+            {{ totalReal?.valueString }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="scheduledLunchBreak">
+          <th mat-header-cell *matHeaderCellDef>SCHED LUNCH & BREAK</th>
+          <td mat-cell *matCellDef="let row">
+            <ng-container class="break-and-lunch">
+              <input
+                type="number" min="0" max="5" placeholder="1"
+                [ngClass]="row.readonly ? 'break-and-lunch-input-border' : 'break-and-lunch-input'"
+                [ngModel]="row.shiftScheduledBreakAndLunch.split(':')[0]"
+                (ngModelChange)="setBreakLunch(row, $event, 'hh')"
+                [readonly]="!row.readonly"
+              />&#8282;
+              <input
+                type="number" min="0" max="59" placeholder="00"
+                [ngClass]="row.readonly ? 'break-and-lunch-input-border' : 'break-and-lunch-input'"
+                [ngModel]="row.shiftScheduledBreakAndLunch.split(':')[1]"
+                (ngModelChange)="setBreakLunch(row, $event, 'mm')"
+                [readonly]="!row.readonly"
+              />
+            </ng-container>
+          </td>
+          <td mat-footer-cell *matFooterCellDef>
+          </td>
+        </ng-container>
+        <ng-container
+          matColumnDef="lunchBreak"
+          style="background-color: aliceblue;"
+        >
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            style="background-color: aliceblue;"
+          >
+            REAL LUNCH & BREAK
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            style="background-color: aliceblue;"
+          >
+            L:{{ row?.lunchHours?.value }} + B:{{ row?.breakHours?.value }}
+          </td>
+          <td
+            mat-footer-cell
+            *matFooterCellDef
+            style="background-color: aliceblue;"
+          >
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <ng-container *ngIf="!row.readonly; else elseTemplate">
+              <button mat-stroked-button (click)="onEdit(row)">EDIT</button>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <button mat-stroked-button color="primary" (click)="onSave(row)">
+                SAVE
+              </button>
+            </ng-template>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tableColumns"></tr>
+        <tr mat-footer-row *matFooterRowDef="tableColumns"></tr>
+      </table>
+      <mat-paginator
+        #paginator
+        [pageSize]="7"
+        [pageSizeOptions]="[7]"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

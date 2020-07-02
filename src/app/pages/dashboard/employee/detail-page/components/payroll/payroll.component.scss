@@ -1,0 +1,19 @@
+mat-form-field {
+  width: 100%;
+}
+.container {
+  margin: 5px;
+}
+
+.form {
+  margin: 10px;
+}
+
+.readonly-wrapper {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+span {
+  margin: 10px;
+}

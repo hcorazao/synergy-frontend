@@ -1,0 +1,116 @@
+<mat-toolbar class="header">
+  <mat-toolbar-row>
+    <span>Workforce Management</span>
+  </mat-toolbar-row>
+  <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between">
+    <div style="font: 400 14px Roboto, 'Helvetica Neue', sans-serif !important;">
+      <mat-form-field appearance="fill">
+        <mat-label>SEARCH</mat-label>
+        <input matInput
+               type="text"
+               placeholder="Search..."
+               [(ngModel)]="filterValue" (keyup)="applyFilter(filterValue)"
+        >
+      </mat-form-field>
+    </div>
+        <div fxLayoutGap="10px">
+          <button mat-button (click)="reload()">
+            REFRESH
+          </button>
+          <button mat-raised-button color="primary" [routerLink]="['/', 'employee', 'upload']" *ngIf="auth?.role === 9999">
+            ADMIN UPLOAD
+          </button>
+          <button mat-raised-button color="primary" [routerLink]="['/', 'employee', 'new']" *ngIf="auth?.create">
+            NEW EMPLOYEE
+          </button>
+        </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+<div>
+    <mat-table #table [dataSource]="dataSource" matSort >
+      <ng-container matColumnDef="employeeId">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          EMPLOYEE ID
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-chip-list>
+            <mat-chip
+              class="mat-indigo-50"
+              [routerLink]="['/', 'employee', 'detail']"
+              [queryParams]="{ id: element._id }"
+              matTooltip="Go to Profile"
+            >
+              <div class="embedded-avatar">
+                <avatar-detail [id]="element._id" [authorization]="this.auth" [embedded]="true"></avatar-detail>
+              </div>
+              <span>
+                <b> {{ element.employeeId }} </b>
+              </span>
+            </mat-chip>
+          </mat-chip-list>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          NAME
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ [element?.firstName, element?.middleName, element?.lastName].join(' ') }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="company.client">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          CLIENT
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.company?.client }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="company.campaign">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          CAMPAIGN
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.company?.campaign }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="company.shiftManager">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          SHIFT MANAGER
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.company?.shiftManager?.name }}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="company.supervisor">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          SUPERVISOR
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.company?.supervisor?.name }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          STATUS
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.status | uppercase }}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+    <mat-paginator
+      [pageSize]="10"
+      [pageSizeOptions]="[10, 20, 30, 50, 100]"
+      showFirstLastButtons
+    >
+    </mat-paginator>
+</div>
